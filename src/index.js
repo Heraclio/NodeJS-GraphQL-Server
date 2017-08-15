@@ -7,6 +7,7 @@ const PORT = 3000
 const connectMongo = require('./mongo-connector');
 const { authenticate } = require('./authenticate');
 const dataloaders = require('./dataloaders');
+const formatError = require('./formatError');
 
 (async () => {
   const mongo = await connectMongo();
@@ -14,6 +15,7 @@ const dataloaders = require('./dataloaders');
     const user = await authenticate(req, mongo.Users);
     return {
       schema,
+      formatError,
       context: { 
         mongo, 
         user, 
