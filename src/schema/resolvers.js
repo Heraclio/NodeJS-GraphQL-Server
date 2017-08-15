@@ -43,8 +43,11 @@ module.exports = {
     },
     Link: { //This is a reference to the Link type, whenever a request the field is requested it will execute the following
         id: root => root._id || root.id,
-        author: async ({ authorId }, data, { mongo: { Users } }) => {
-            return await Users.findOne({ _id: authorId });
+        author: async ({ authorId }, data, { mongo: { Users }, dataloaders: { userLoader } }) => {
+            // return await Users.findOne({ _id: authorId });
+            if (authorId) {
+                return await userLoader.load(authorId);
+            }
         },
         votes: async ({ _id }, data, { mongo: { Votes } }) => {
             return await Votes.find({ linkId: _id }).toArray();
@@ -55,8 +58,10 @@ module.exports = {
     },
     Vote: {
         id: root => root._id || root.id,
-        user: async ({ userId }, data, { mongo: { Users } }) => {
-            return await Users.findOne({ _id: userId });
+        user: async ({ userId }, data, { mongo: { Users }, dataloaders: { userLoader } }) => {
+            if (userId) {
+                return await userLoader.load(userId);
+            }
         },
         link: async ({ linkId }, data, { mongo: { Links } }) => {
             return await Links.findOne({ _id: linkId });

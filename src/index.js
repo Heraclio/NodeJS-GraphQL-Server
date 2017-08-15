@@ -6,6 +6,7 @@ const app = express();
 const PORT = 3000
 const connectMongo = require('./mongo-connector');
 const { authenticate } = require('./authenticate');
+const dataloaders = require('./dataloaders');
 
 (async () => {
   const mongo = await connectMongo();
@@ -13,8 +14,12 @@ const { authenticate } = require('./authenticate');
     const user = await authenticate(req, mongo.Users);
     return {
       schema,
-      context: { mongo, user }, // `context ` is a special GraphQL object that gets passed to all resolvers, so it's a perfect place to share code between them
-    }
+      context: { 
+        mongo, 
+        user, 
+        dataloaders: dataloaders(mongo), 
+      }, // `context ` is a special GraphQL object that gets passed to all resolvers, so it's a perfect place to share code between them
+    };
   };
 
   app.use('/graphql', bodyParser.json(), graphqlExpress(graphqlExpressConfiguration));
