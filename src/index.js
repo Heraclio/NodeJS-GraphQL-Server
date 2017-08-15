@@ -9,20 +9,19 @@ const { authenticate } = require('./authenticate');
 
 (async () => {
   const mongo = await connectMongo();
-  const graphiqlExpressConfiguration = async (req, res) => {
+  const graphqlExpressConfiguration = async (req, res) => {
     const user = await authenticate(req, mongo.Users);
-
     return {
       schema,
-      context: { mongo }, // `context ` is a special GraphQL object that gets passed to all resolvers, so it's a perfect place to share code between them
+      context: { mongo, user }, // `context ` is a special GraphQL object that gets passed to all resolvers, so it's a perfect place to share code between them
     }
   };
 
-  app.use('/graphql', bodyParser.json(), graphqlExpress(graphiqlExpressConfiguration));
+  app.use('/graphql', bodyParser.json(), graphqlExpress(graphqlExpressConfiguration));
 
   app.use('/graphiql', graphiqlExpress({
     endpointURL: '/graphql',
-    passHeader: `'Authorization': 'bearer token-heraclio.rios@vivintsolar.com'`,
+    passHeader: `'Authorization': 'bearer token-heraclio.rios@vivintsolar.com'`, // This header is passed on all the calls, we'd want to make this source a JWT.
   }));
 
   app.listen(PORT, () => {

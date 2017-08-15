@@ -1,14 +1,16 @@
 module.exports = {
     Query: {
-        allLinks: async (root, data, context) => {
-            const mongo = context.mongo;
+        allLinks: async (root, data, { mongo: { Links } }) => {
             // We are accessing the Links collection in Mongo and converting the results into an array.      
-            return await mongo.Links.find({}).toArray();
+            return await Links.find({}).toArray();
         },
+        allUsers: async (root, data, { mongo: { Users } }) => {
+            return await Users.find({}).toArray();
+        }
     },
     Mutation: {
         createLink: async (root, data, { mongo: { Links }, user }) => {
-            const newLink = Object.assign({author: user && user._id }, data);
+            const newLink = Object.assign({ authorId: user && user._id }, data);
             const response = await Links.insert(newLink);
             return Object.assign({ id: response.insertedIds[0] }, newLink);
         },
@@ -31,8 +33,8 @@ module.exports = {
     },
     Link: { //This is a reference to the Link type, whenever a request the field is requested it will execute the following
         id: root => root._id || root.id,
-        author: async ({ id }, data, { mongo: {Users}}) => {
-            return await Users.findOne({_id: id});
+        author: async ({ authorId }, data, { mongo: {Users}}) => {
+            return await Users.findOne({_id: authorId});
         }
     },
     User: { //This is a reference to the Link type, whenever a request the field is requested it will execute the following
