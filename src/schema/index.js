@@ -8,6 +8,7 @@ const typeDefs = `
         url: String!
         description: String!
         author: User
+        votes: [Vote!]!
     }
 
     type User {
@@ -44,8 +45,8 @@ const typeDefs = `
 
     type Vote {
         id: ID!
-        link: Link!
         user: User!
+        link: Link!
     }
 `;
 
